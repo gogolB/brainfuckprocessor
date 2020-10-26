@@ -27,17 +27,17 @@ class MemoryController (n:Int) extends Module {
 
   val mem = new RAM(n)
 
-  object State extends ChiselEnum {
-    val sIdle, sRead, sReadDone, sWrite, sWriteDone= Value
-  }
+
+  val sIdle::sRead::sReadDone::sWrite::sWriteDone=Enum(UInt(3.W), 5)
   
-  val state = RegInit(State.sNone)
+  
+  val state = RegInit(sIdle)
 
   isDone := false.B
   switch (state) {
 
     // Idle State
-    is (State.sIdle) {
+    is (sIdle) {
       when (io.WR) {
         state := sWrite
       }.elsewhen(io.RD) {
@@ -48,23 +48,23 @@ class MemoryController (n:Int) extends Module {
     }
 
     // PrereadState
-    is (State.sRead) {
-      isDone := false.B
+    is (sRead) {
+      io.isDone := false.B
     }
 
     // Finished Read State
-    is (State.sReadDone) {
-      isDone := true.B
+    is (sReadDone) {
+      io.isDone := true.B
     }
 
     // PreWriteState
-    is (State.sWrite) {
-      isDone := false.B
+    is (sWrite) {
+      io.isDone := false.B
     }
 
     // Finished Write State
-    is (State.sWriteDone ) {
-      isDone := true.B
+    is (sWriteDone ) {
+      io.isDone := true.B
     }
   }
 }
