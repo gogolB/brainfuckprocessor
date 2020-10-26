@@ -28,12 +28,12 @@ class MemoryController (n:Int) extends Module {
   val mem = new RAM(n)
 
 
-  val sIdle::sRead::sReadDone::sWrite::sWriteDone=Enum(UInt(3.W), 5)
+  val sIdle::sRead::sReadDone::sWrite::sWriteDone=Enum(5)
   
   
   val state = RegInit(sIdle)
 
-  isDone := false.B
+  io.isDone := false.B
   switch (state) {
 
     // Idle State
