@@ -25,16 +25,25 @@ class MemoryController (n:Int) extends Module {
     val isDone          = Output(Bool())
   })
 
+  // States
+  val sInit::sIdle::sRead::sReadDone::sWrite::sWriteDone=Enum(6)
+
+  // Internal RAM Module, to be replaced by actual S/DRAM
   val mem = new RAM(n)
-
-
-  val sIdle::sRead::sReadDone::sWrite::sWriteDone=Enum(5)
   
-  
-  val state = RegInit(sIdle)
+  // Internal variables.
+  val state = RegInit(sInit)
 
+
+  // Setting UP IO to connect to external.
   io.isDone := false.B
   switch (state) {
+
+    // Initilization Step.
+    is(sInit) {
+      io.isDone := false.B
+      state := sIdle
+    }
 
     // Idle State
     is (sIdle) {
