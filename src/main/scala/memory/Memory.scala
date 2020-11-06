@@ -11,7 +11,7 @@ import chisel3.util._
  * nBank: The number of memoryBanks.
  * nWordSize: The wordsize.
  */
-class RAM (nAddr:Int, nBank:Int, nWordSize:int) extends Module {
+class RAM (nAddr:Int, nBank:Int, nWordSize:Int) extends Module {
   val io = IO(new Bundle {
     val WR_DATA         = Input(Vec(nBank, UInt(nWordSize.W)))
     val WR              = Input(Bool())
