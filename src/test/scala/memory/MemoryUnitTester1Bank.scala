@@ -70,7 +70,7 @@ class MemoryUnitTester1Bank(c: RAM) extends PeekPokeTester(c) {
 
 }
 
-class MemoryTester extends ChiselFlatSpec {
+class MemoryTester1Bank extends ChiselFlatSpec {
 // Disable this until we fix isCommandAvailable to swallow stderr along with stdout
   private val backendNames = if(false && firrtl.FileUtils.isCommandAvailable(Seq("verilator", "--version"))) {
     Array("firrtl", "verilator")
