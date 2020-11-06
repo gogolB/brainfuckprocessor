@@ -6,26 +6,18 @@ import chisel3._
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class MemoryUnitTester(c: RAM) extends PeekPokeTester(c) {
+class MemoryUnitTester1Bank(c: RAM) extends PeekPokeTester(c) {
 
   private val ram = c
 
   // Start write testing.
   for(i <- 0 to 31) {
 
-
     poke(ram.io.WR, false);
     poke(ram.io.WR_ADDR, i)
     poke(ram.io.WR_DATA(0), i+10)
-    poke(ram.io.WR_DATA(1), i+11)
-    poke(ram.io.WR_DATA(2), i+12)
-    poke(ram.io.WR_DATA(3), i+13)
     // Write to all columns
     poke(ram.io.MASK(0), true) // Write to all columns
-    poke(ram.io.MASK(1), true)
-    poke(ram.io.MASK(2), true)
-    poke(ram.io.MASK(3), true)
-
     poke(ram.io.WR, true);
     step(1)
   }
@@ -41,9 +33,6 @@ class MemoryUnitTester(c: RAM) extends PeekPokeTester(c) {
     poke(ram.io.RD, true)
     step(1)
     expect(ram.io.RD_DATA(0), i+10)
-    expect(ram.io.RD_DATA(1), i+11)
-    expect(ram.io.RD_DATA(2), i+12)
-    expect(ram.io.RD_DATA(3), i+13)
   }
 
   // Now conduct syncronous testing.
@@ -51,15 +40,11 @@ class MemoryUnitTester(c: RAM) extends PeekPokeTester(c) {
   poke(ram.io.WR, false);
   poke(ram.io.WR_ADDR, 0)
   poke(ram.io.WR_DATA(0), 11)
-  poke(ram.io.WR_DATA(1), 12)
-  poke(ram.io.WR_DATA(2), 13)
-  poke(ram.io.WR_DATA(3), 14)
+
 
   // Write to all columns
   poke(ram.io.MASK(0), true);
-  poke(ram.io.MASK(1), true);
-  poke(ram.io.MASK(2), true);
-  poke(ram.io.MASK(3), true);
+
   poke(ram.io.WR, true);
   step(1)
 
@@ -68,15 +53,11 @@ class MemoryUnitTester(c: RAM) extends PeekPokeTester(c) {
     // To the i'th row add the value i + 11.
     poke(ram.io.WR_ADDR, i)
     poke(ram.io.WR_DATA(0), i+11)
-    poke(ram.io.WR_DATA(1), i+12)
-    poke(ram.io.WR_DATA(2), i+13)
-    poke(ram.io.WR_DATA(3), i+14)
+
 
     // Write to all columns
     poke(ram.io.MASK(0), true);
-    poke(ram.io.MASK(1), true);
-    poke(ram.io.MASK(2), true);
-    poke(ram.io.MASK(3), true);
+
     poke(ram.io.WR, true);
 
     // Check the previous row. It should have the value i+10
@@ -85,9 +66,6 @@ class MemoryUnitTester(c: RAM) extends PeekPokeTester(c) {
     poke(ram.io.RD, true)
     step(1)
     expect(ram.io.RD_DATA(0), (i-1)+11)
-    expect(ram.io.RD_DATA(1), (i-1)+12)
-    expect(ram.io.RD_DATA(2), (i-1)+13)
-    expect(ram.io.RD_DATA(3), (i-1)+14)
   }
 
 }
@@ -102,30 +80,31 @@ class MemoryTester extends ChiselFlatSpec {
   }
   for ( backendName <- backendNames ) {
     "Memory" should s"SyncReadWrite (with $backendName)" in {
-      Driver(() => new RAM(32768, 4, 8), backendName) {
-        c => new MemoryUnitTester(c)
+      Driver(() => new RAM(32768, 1, 16), backendName) {
+        c => new MemoryUnitTester1Bank(c)
       } should be (true)
     }
   }
 
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
-    iotesters.Driver.execute(Array(), () => new RAM(32768, 4, 8)) {
-      c => new MemoryUnitTester(c)
+    iotesters.Driver.execute(Array(), () => new RAM(32768, 1, 16)) {
+      c => new MemoryUnitTester1Bank(c)
     } should be (true)
   }
 
   "using --backend-name verilator" should "be an alternative way to run using verilator" in {
     if(backendNames.contains("verilator")) {
-      iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new RAM(32768, 4, 8)) {
-        c => new MemoryUnitTester(c)
+      iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new RAM(32768, 1, 16)) {
+        c => new MemoryUnitTester1Bank(c)
       } should be(true)
     }
   }
 
   "running with --is-verbose" should "show more about what's going on in your tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new RAM(32768, 4, 8)) {
-      c => new MemoryUnitTester(c)
+    iotesters.Driver.execute(Array("--is-verbose"), () => new RAM(32768, 1, 16)) {
+      c => new MemoryUnitTester1Bank(c)
     } should be(true)
   }
+
 }
 
