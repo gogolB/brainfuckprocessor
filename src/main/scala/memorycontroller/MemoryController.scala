@@ -10,9 +10,9 @@ import chisel3.util._
 /** 
  * The memorycontroller for the processor implementation.
  */
-class MemoryController (nADDR:Int, nWordSize:Int) extends Module {
+class MemoryController (nAddr:Int, nWordSize:Int) extends Module {
   val io = IO(new Bundle {
-    val ADDR            = Input(UInt(log2Ceil(n).W))
+    val ADDR            = Input(UInt(log2Ceil(nAddr).W))
 
     val WR_DATA         = Input(UInt(32.W))
     val RD_DATA         = Output(UInt(32.W))
@@ -22,7 +22,4 @@ class MemoryController (nADDR:Int, nWordSize:Int) extends Module {
 
     val isDone          = Output(Bool())
   })
-
-  io.RD_DATA = DontCare
-  io.isDone = DontCare
 }
