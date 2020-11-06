@@ -11,12 +11,12 @@ import chisel3.util._
  * nBank: The number of memoryBanks.
  * nWordSize: The wordsize.
  */
-class RAM (nAddr:UInt, nBank:UInt, nWordSize:Uint) extends Module {
+class RAM (nAddr:Int, nBank:Int, nWordSize:int) extends Module {
   val io = IO(new Bundle {
     val WR_DATA         = Input(Vec(nBank, UInt(nWordSize.W)))
     val WR              = Input(Bool())
-    val WR_ADDR         = Input(UInt((log2Ceil(nAddr)-log2(nBank)).W))
-    val RD_ADDR         = Input(UInt((log2Ceil(nAddr)-log2(nBank)).W))
+    val WR_ADDR         = Input(UInt((log2Ceil(nAddr)-log2Ceil(nBank)).W))
+    val RD_ADDR         = Input(UInt((log2Ceil(nAddr)-log2Ceil(nBank)).W))
     val RD              = Input(Bool())
     val MASK            = Input(Vec(nBank, Bool()))
 
